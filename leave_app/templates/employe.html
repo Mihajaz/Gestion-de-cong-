@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Demande de Congé - WorkBalance{% endblock %}
+
+{% block content %}
+    <div class="form-container" style="max-width: 600px; margin: 50px auto; padding: 20px; border-radius: 10px; background: white; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);">
+        <h3 class="text-center mb-4">Demande de Congé</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="startDate" class="form-label">Date de début</label>
+                <input type="date" class="form-control" id="startDate" name="startDate" required>
+            </div>
+            <div class="mb-3">
+                <label for="endDate" class="form-label">Date de fin</label>
+                <input type="date" class="form-control" id="endDate" name="endDate" required>
+            </div>
+            <div class="mb-3">
+                <label for="reason" class="form-label">Raison</label>
+                <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Envoyer la demande</button>
+        </form>
+    </div>
+{% endblock %}
