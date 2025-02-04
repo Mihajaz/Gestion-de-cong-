@@ -1,22 +1,56 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-    </head>
-    <body>
-        <!--[if lt IE 7]>
-            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
-        <h1>Validation</h1>
-        <script src="" async defer></script>
-    </body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Validation des Congés{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <h3 class="text-center mb-4">Validation des Demandes de Congés</h3>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">Nom</th>
+                        <th scope="col">Poste</th>
+                        <th scope="col">Date début</th>
+                        <th scope="col">Date fin</th>
+                        <th scope="col">Raison</th>
+                        <th scope="col">Validation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Exemple de ligne de tableau -->
+                    <tr>
+                        <td>Jean Claude</td>
+                        <td>RH</td>
+                        <td>2025-02-10</td>
+                        <td>2025-02-15</td>
+                        <td>Vacances annuelles</td>
+                        <td>
+                            <a href="#" class="btn btn-success btn-sm">Valider</a>
+                            <a href="#" class="btn btn-danger btn-sm">Ne pas valider</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Martin mystère </td>
+                        <td>Technicien</td>
+                        <td>2025-03-01</td>
+                        <td>2025-03-05</td>
+                        <td>Raisons familiales</td>
+                        <td>
+                            <a href="#" class="btn btn-success btn-sm">Valider</a>
+                            <a href="#" class="btn btn-danger btn-sm">Ne pas valider</a>
+                        </td>
+                    </tr>
+                    <!-- Ajoutez d'autres lignes ici -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <style>
+        .table th, .table td {
+            text-align: center;
+        }
+    </style>
+{% endblock %}
