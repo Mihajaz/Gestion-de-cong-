@@ -28,6 +28,16 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+# Redirige les utilisateurs non connectés vers la page de connexion
+LOGIN_URL = 'login'
+
+# Page vers laquelle l'utilisateur est redirigé après une connexion réussie
+LOGIN_REDIRECT_URL = 'home'
+
+# Page vers laquelle l'utilisateur est redirigé après une déconnexion
+LOGOUT_REDIRECT_URL = 'login'
+
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -38,7 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'leave_app',
-    'viewflow'
+    'viewflow',
 ]
 
 MIDDLEWARE = [
