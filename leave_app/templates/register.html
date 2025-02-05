@@ -30,16 +30,25 @@
         <form method="POST" action="{% url 'register' %}">
             
             {% csrf_token %}
-
+            
             <div class="mb-3">
                 <label for="username" class="form-label">Nom d'utilisateur</label>
                 <input type="text" class="form-control" id="username" name="username" placeholder="Entrez votre nom" required>
             </div>
-
+            
             <div class="mb-3">
                 <label for="poste" class="form-label">Poste</label>
-                <input type="text" class="form-control" id="poste" name="poste" placeholder="Entrez votre poste" required>
+                <select class="form-select" id="poste" name="poste" required>
+                    <option value="" disabled selected>Choisissez votre poste</option>
+                    <option value="Directeur">Directeur</option>
+                    <option value="Manageur">Manageur</option>
+                    <option value="Comptable">Comptable</option>
+                    <option value="Dev">Dev</option>
+                    <option value="RH">RH</option>
+                    <option value="Gardien">Gardien</option>
+                </select>
             </div>
+            
 
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>

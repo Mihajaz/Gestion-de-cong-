@@ -8,6 +8,7 @@ from .models import Employee
 
 
 
+
 # Create your views here.
 
 #interface d'accueil
@@ -26,39 +27,68 @@ def register(request):
         poste = request.POST['poste']
         password = request.POST['password']
         email = request.POST['email']
+    
+        print("PARAMS POST")
+        print(request.POST)
         
-        #verification des utilisateurs si il existe déjà
-        if Employee.objects.filter(username=username).exists():
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password
+        )
+        
+        
+        if Employee.objects.filter(user_id=user.id).exists():
             messages.error(request,"ce nom d'utilisateur existe déja") 
         else:
-            user = Employee.objects.create(username=username, poste=poste, password=password, email=email)
-            user.save()
+            Employee.objects.create(user_id=user, poste=poste)
             messages.success(request,"Inscription reussie.Connecter-vous maintenant!")
             return redirect('login')
     
     return render(request,'register.html')
       
-      #interface et condition de login
-def user_login(request):
+      
+# interface et condition de login
+def login_view(request):
     if request.method == "POST":
-        username = request.POST['username']
-        password = request.POST['password']
-       
-
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        # print(request.POST)
+        # print(username)
+        
+        print("REQUEST PARAMS")
+        print(request.POST)
+        
+        Employee = authenticate(request, username=username, password=password)  # Vérifie les identifiants
+        print("Authenticate user")
+        print(Employee)
+        
+        if Employee is not None:
+            print('logged in')
+            login(request,Employee) 
+            # Connecte l'utilisateur
             messages.success(request, "Connexion réussie.")
-            return redirect('home')  # Redirige vers la page d'accueil
+
+            # Redirection en fonction du poste
+            if hasattr(Employee, 'poste'):  # Vérifie si le champ existe
+                if Employee.poste in ["Directeur", "Manageur"]:
+                    return redirect('validation')
+                else:
+                    return redirect('employe')
+            else:
+                return redirect('employe')  # Redirection par défaut
+
         else:
             messages.error(request, "Nom d'utilisateur ou mot de passe incorrect.")
 
     return render(request, 'login.html')
-            
 
-#interface de login
-def login(request):
-    return render(request,'login.html')
+
+
+
+
+
+
 #logout
 def user_logout(request):
     logout(request)
