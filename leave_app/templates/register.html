@@ -28,11 +28,19 @@
     <div class="register-form">
         <h3 class="text-center mb-4">Créer un compte</h3>
         <form method="POST" action="{% url 'register' %}">
-             {% csrf_token %}
+            
+            {% csrf_token %}
+
             <div class="mb-3">
                 <label for="username" class="form-label">Nom d'utilisateur</label>
                 <input type="text" class="form-control" id="username" name="username" placeholder="Entrez votre nom" required>
             </div>
+
+            <div class="mb-3">
+                <label for="poste" class="form-label">Poste</label>
+                <input type="text" class="form-control" id="poste" name="poste" placeholder="Entrez votre poste" required>
+            </div>
+
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="Entrez votre email" required>

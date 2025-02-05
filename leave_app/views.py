@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-
+from .models import Employee
 
 
 
@@ -15,7 +15,7 @@ def home(request):
     return render(request, 'home.html')
 
 #interface du directeur et manageur
-@login_required
+
 def validation(request):
     return render(request,'validation.html')
 
@@ -23,13 +23,15 @@ def validation(request):
 def register(request):
     if request.method == "POST":
         username = request.POST['username']
+        poste = request.POST['poste']
         password = request.POST['password']
+        email = request.POST['email']
         
         #verification des utilisateurs si il existe déjà
-        if User.objects.filter(username=username).exists():
+        if Employee.objects.filter(username=username).exists():
             messages.error(request,"ce nom d'utilisateur existe déja") 
         else:
-            user = User.objects.create_user(username=username, password=password)
+            user = Employee.objects.create(username=username, poste=poste, password=password, email=email)
             user.save()
             messages.success(request,"Inscription reussie.Connecter-vous maintenant!")
             return redirect('login')
@@ -41,6 +43,7 @@ def user_login(request):
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
+       
 
         user = authenticate(request, username=username, password=password)
         if user is not None:
