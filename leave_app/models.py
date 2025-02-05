@@ -1,16 +1,17 @@
 from django.db import models
 from viewflow.models import Process
+from django.contrib.auth.models import User
+
 # Create your models here.
 
 #modèle employé
 class Employee(models.Model):
-    username = models.CharField(max_length=50, default="username")
-    email = models.EmailField(max_length=254, default="email")
-    password = models.CharField(max_length=100, default="password")
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     poste = models.CharField(max_length=100, default="poste")
     
+    
     def __str__(self):
-        return self.username
+        return self.username if self.user_id else "Employe sans utilisateur"
     
 #demander un congé
 class LeaveRequest(models.Model):
