@@ -27,8 +27,10 @@
     
     <div class="register-form">
         <h3 class="text-center mb-4">Se connecter</h3>
+
+    
     <form method="POST" action="{% url 'login' %}">
-            {% csrf_token %}
+    {% csrf_token %}
             <div class="mb-3">
                 <label for="username" class="form-label">Nom d'utilisateur</label>
                 <input type="text" class="form-control" id="username" name="username" placeholder="Entrez votre nom" required>
@@ -38,7 +40,7 @@
                 <input type="password" class="form-control" id="password" name="password" placeholder="Entrez votre mot de passe" required>
             </div>
             <input type="submit" class="btn btn-primary w-100" value="se connecter">Se connecter
-        </form>
+    </form>
         
         {% if messages %}
           <div class="alert alert-info">

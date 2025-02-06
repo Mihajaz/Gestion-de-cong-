@@ -4,10 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
-from .models import Employee
-
-
-
+from .models import Employee, LeaveRequest
 
 # Create your views here.
 
@@ -16,9 +13,13 @@ def home(request):
     return render(request, 'home.html')
 
 #interface du directeur et manageur
-
+@login_required
 def validation(request):
-    return render(request,'validation.html')
+    if request.user.employee.poste not in ["Directeur", "Manageur"]:
+        return redirect('employe')
+    demandes = LeaveRequest.objects.all()
+    return render(request, 'validation.html', {'demandes':demandes})
+    
 
 #interface et condition de signin
 def register(request):
@@ -78,20 +79,40 @@ def login_view(request):
 
     return render(request, 'login.html')
 
-
-
-
-
-
-
 #logout
 def user_logout(request):
     logout(request)
     messages.success(request, "Vous avez été déconnecté.")
     return redirect('login')
 
+
+
+
 #interface des employés
 @login_required
 def employe(request):
-    return render(request,'employe.html')
+    if request.method == "POST":
+        start_date = request.POST['start_date']
+        end_date = request.POST['end_date']
+        reason = request.POST['reason']
+        
+        
+        if start_date and end_date and reason:
+            #recupère l'Employee associe a l'utilisateur
+            employee = request.user.employee
+            
+            #Cree et enregistre la demande de congé
+            LeaveRequest.objects.create(
+                employee=employee,
+                start_date=start_date,
+                end_date=end_date,  
+                reason=reason,
+            )
+         
+    
+            messages.success(request, "Votre demande de conge a bien ete envoyee.")
+            return redirect('employe')
+    return render(request, 'employe.html')
+            
+    
 
