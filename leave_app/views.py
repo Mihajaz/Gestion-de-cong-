@@ -53,31 +53,26 @@ def login_view(request):
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
+        
         # print(request.POST)
         # print(username)
         
-        print("REQUEST PARAMS")
-        print(request.POST)
+        user = authenticate(request, username=username, password=password)  # Vérifie les identifiants
         
-        Employee = authenticate(request, username=username, password=password)  # Vérifie les identifiants
-        print("Authenticate user")
-        print(Employee)
-        
-        if Employee is not None:
+        if user is not None:
             print('logged in')
-            login(request,Employee) 
+            login(request,user) 
+            
             # Connecte l'utilisateur
             messages.success(request, "Connexion réussie.")
 
             # Redirection en fonction du poste
-            if hasattr(Employee, 'poste'):  # Vérifie si le champ existe
-                if Employee.poste in ["Directeur", "Manageur"]:
-                    return redirect('validation')
-                else:
-                    return redirect('employe')
+        
+            if user.employee.poste in ["Directeur", "Manageur"]:
+                return redirect('validation')
             else:
-                return redirect('employe')  # Redirection par défaut
-
+                return redirect('employe')
+        
         else:
             messages.error(request, "Nom d'utilisateur ou mot de passe incorrect.")
 

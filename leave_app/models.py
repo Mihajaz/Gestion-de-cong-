@@ -6,12 +6,12 @@ from django.contrib.auth.models import User
 
 #modèle employé
 class Employee(models.Model):
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    poste = models.CharField(max_length=100, default="poste")
+    user_id = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='employee')
+    poste = models.CharField(max_length=100, null=True, blank=True) 
     
     
     def __str__(self):
-        return self.username if self.user_id else "Employe sans utilisateur"
+        return self.user_id.username if self.user_id else "Employe sans utilisateur"
     
 #demander un congé
 class LeaveRequest(models.Model):
