@@ -22,25 +22,21 @@
                     <tbody>
                     <tr>
                         <td scope="col">{{demande.employee.user_id.username}}</td>
-                        <td scope="col"> {{demande.employee.poste}}</td>
-                        <td scope="col"> {{demande.start_date}}</td>
-                        <td scope="col"> {{demande.end_date }}</td>
+                        <td scope="col">{{demande.employee.poste}}</td>
+                        <td scope="col">{{demande.start_date}}</td>
+                        <td scope="col">{{demande.end_date}}</td>
                         <td scope="col">{{demande.reason}}</td>
                         <td scope="col">
-                            <a href="#" class="btn btn-success btn-sm">Valider</a>
-                        <a href="#" class="btn btn-danger btn-sm">Ne pas valider</a>
+                            <a href="#" class="btn btn-success btn-sm" onclick="validateRequest(this, true)">Valider</a>
+                            <a href="#" class="btn btn-danger btn-sm" onclick="validateRequest(this, false)">Ne pas valider</a>
                         </td>
                     </tr>
-                   </tbody>
-                    
+                    </tbody>
                {% empty %}
                <tr>
                 <td colspan="6" class="text-center">Aucune demande de congé en attente</td>
                 </tr>
-
             {% endfor %}
-
-
             </table>
         </div>
     </div>
@@ -49,6 +45,35 @@
         .table th, .table td {
             text-align: center;
         }
-        
     </style>
+
+    <script>
+        function validateRequest(button, isValid) {
+            const parentRow = button.closest('tr');
+            const validateButton = parentRow.querySelector('.btn-success');
+            const declineButton = parentRow.querySelector('.btn-danger');
+            
+            if (isValid) {
+                // Change to "Validé" with green color
+                validateButton.textContent = 'Validé';
+                validateButton.classList.remove('btn-success');
+                validateButton.classList.add('btn-success', 'disabled');
+                
+                // Change the other button to "X" with red color
+                declineButton.innerHTML = '<i class="fas fa-times"></i>';
+                declineButton.classList.remove('btn-danger');
+                declineButton.classList.add('btn-danger', 'disabled');
+            } else {
+                // Change to "Non validé" with red color
+                declineButton.innerHTML = 'Non validé';
+                declineButton.classList.remove('btn-danger');
+                declineButton.classList.add('btn-danger', 'disabled');
+                
+                // Change the other button to "✓" with green color
+                validateButton.innerHTML = '<i class="fas fa-check"></i>';
+                validateButton.classList.remove('btn-success');
+                validateButton.classList.add('btn-success', 'disabled');
+            }
+        }
+    </script>
 {% endblock %}

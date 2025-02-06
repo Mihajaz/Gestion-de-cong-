@@ -4,19 +4,22 @@
 
 {% block content %}
 
-<i class="bi bi-bell-fill" id="notification-icon" style="position: fixed; top: 100px; right: 175px; font-size: 2rem; cursor: pointer;"></i>
+<i class="bi bi-bell-fill" id="notification-icon" style="position: fixed; top: 80px; right: 150px; font-size: 2rem; cursor: pointer;"></i>
 
 <!-- Interface de notification (cachée par défaut) -->
 <div id="notification-panel" style="display: none; position: fixed; top: 140px; right: 200px; width: 250px; background: white; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); padding: 15px; border-radius: 8px;">
     <div class="d-grid gap-2">
-        
         <p><strong>Votre demande :</strong></p>
-        {% if last_leave_request %}
-        <p>Congé du  <span id="notif-start-date">{{ last_leave_request.start_date }}</span> </span> au {{ last_leave_request.end_date }} <span id="notif-end-date"></span></p>
-        <div class="text-center p-2" style="background: #f8d7da; color: #721c24; border-radius: 5px;">
-            En attente
-        </div>
-
+        
+        {% if pending_leave_requests %}
+            {% for request in pending_leave_requests %}
+                <p>
+                    Congé du <span>{{ request.start_date }}</span> au <span>{{ request.end_date }}</span>
+                    <div class="text-center p-2" style="background: #f8d7da; color: #721c24; border-radius: 5px;">
+                        {{ request.status|default:"En attente" }}
+                    </div>
+                </p>
+            {% endfor %}
         {% else %}
             <p>Aucune demande de congé en attente.</p>
         {% endif %}

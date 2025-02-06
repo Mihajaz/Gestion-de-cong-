@@ -17,9 +17,29 @@ def home(request):
 def validation(request):
     if request.user.employee.poste not in ["Directeur", "Manageur"]:
         return redirect('employe')
-    demandes = LeaveRequest.objects.all()
-    return render(request, 'validation.html', {'demandes':demandes})
     
+    if request.method == "POST":
+        leave_request_id = request.POST.get("leave_request_id")
+        action = request.POST.get("action")  # 'valider' ou 'refuser'
+
+        try:
+            leave_request = LeaveRequest.objects.get(id=leave_request_id)
+        except LeaveRequest.DoesNotExist:
+            messages.error(request, "Demande de congé introuvable.")
+            return redirect('validation')
+
+        if action == "valider":
+            leave_request.status = "Validé"
+        elif action == "refuser":
+            leave_request.status = "Refusé"
+        
+        leave_request.save()
+        messages.success(request, f"Demande de congé {action}e avec succès.")
+    
+    demandes = LeaveRequest.objects.all()
+    return render(request, 'validation.html', {'demandes': demandes})
+
+
 
 #interface et condition de signin
 def register(request):
@@ -114,8 +134,8 @@ def employe(request):
             return redirect('employe')
     # Récupérer la dernière demande de congé en attente de l'utilisateur
     employee = request.user.employee
-    last_leave_request = LeaveRequest.objects.filter(employee=employee, approval__isnull=True).last()    
-    return render(request, 'employe.html', {'last_leave_request': last_leave_request})
+    pending_leave_requests = LeaveRequest.objects.filter(employee=employee, approval__isnull=True)  
+    return render(request, 'employe.html', {'pending_leave_requests': pending_leave_requests})
             
     
 

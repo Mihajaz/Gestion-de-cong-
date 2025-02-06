@@ -19,6 +19,8 @@ class LeaveRequest(models.Model):
     start_date = models.DateField(auto_now=False, auto_now_add=False)
     end_date = models.DateField(auto_now=False, auto_now_add=False)
     reason = models.TextField(max_length=50)
+    status = models.CharField(max_length=20, default="En attente", choices=[("En attente", "En attente"), ("Validé", "Validé"), ("Refusé", "Refusé")])
+
     
     
 class Approval(models.Model):
