@@ -112,7 +112,10 @@ def employe(request):
     
             messages.success(request, "Votre demande de conge a bien ete envoyee.")
             return redirect('employe')
-    return render(request, 'employe.html')
+    # Récupérer la dernière demande de congé en attente de l'utilisateur
+    employee = request.user.employee
+    last_leave_request = LeaveRequest.objects.filter(employee=employee, approval__isnull=True).last()    
+    return render(request, 'employe.html', {'last_leave_request': last_leave_request})
             
     
 
