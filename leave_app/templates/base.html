@@ -30,9 +30,15 @@
                 </ul>
                 <div class="d-flex align-items-center">
                     <i class="bi bi-person-circle text-white me-2" style="font-size: 1.5rem;"></i>
-                    <a href="{% url 'login' %}" class="btn btn-outline-light">Se connecter</a>
-                    <a href="{% url 'logout' %}" class="btn btn-danger">Se déconnecter</a>
-
+                    
+                    {% if user.is_authenticated %}
+                        <!-- Afficher le nom d'utilisateur si l'utilisateur est authentifié -->
+                        <span class="text-white me-2">{{ user.username }}</span>
+                        <a href="{% url 'logout' %}" class="btn btn-danger">Se déconnecter</a>
+                    {% else %}
+                        <!-- Si non authentifié, afficher les liens de connexion -->
+                        <a href="{% url 'login' %}" class="btn btn-outline-light">Se connecter</a>
+                    {% endif %}
                 </div>
             </div>
         </div>
