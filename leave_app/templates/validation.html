@@ -32,8 +32,8 @@
                                 <form method="POST" action="{% url 'validation' %}">
                                     {% csrf_token %}
                                     <input type="hidden" name="leave_request_id" value="{{ demande.id }}">
-                                    <button type="submit" name="action" value="valider" class="btn btn-success btn-sm" onclick="validateRequest(this, true)">Valider</button>
-                                    <button type="submit" name="action" value="refuser" class="btn btn-danger btn-sm" onclick="validateRequest(this, false)">Ne pas valider</button>
+                                    <button type="submit" name="action" value="valider" class="btn btn-success btn-sm" ">Valider</button>
+                                    <button type="submit" name="action" value="refuser" class="btn btn-danger btn-sm" ">Ne pas valider</button>
                                 </form>
                             {% elif demande.status == "Validé" %}
                                 <span class="text-success">Validé</span>
@@ -58,33 +58,4 @@
         }
     </style>
 
-    <script>
-        function validateRequest(button, isValid) {
-            const parentRow = button.closest('tr');
-            const validateButton = parentRow.querySelector('.btn-success');
-            const declineButton = parentRow.querySelector('.btn-danger');
-            
-            if (isValid) {
-                // Change to "Validé" with green color
-                validateButton.textContent = 'Validé';
-                validateButton.classList.remove('btn-success');
-                validateButton.classList.add('btn-success', 'disabled');
-                
-                // Change the other button to "X" with red color
-                declineButton.innerHTML = '<i class="fas fa-times"></i>';
-                declineButton.classList.remove('btn-danger');
-                declineButton.classList.add('btn-danger', 'disabled');
-            } else {
-                // Change to "Non validé" with red color
-                declineButton.innerHTML = 'Non validé';
-                declineButton.classList.remove('btn-danger');
-                declineButton.classList.add('btn-danger', 'disabled');
-                
-                // Change the other button to "✓" with green color
-                validateButton.innerHTML = '<i class="fas fa-check"></i>';
-                validateButton.classList.remove('btn-success');
-                validateButton.classList.add('btn-success', 'disabled');
-            }
-        }
-    </script>
 {% endblock %}
