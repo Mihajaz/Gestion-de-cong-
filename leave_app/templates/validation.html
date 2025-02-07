@@ -27,8 +27,19 @@
                         <td scope="col">{{demande.end_date}}</td>
                         <td scope="col">{{demande.reason}}</td>
                         <td scope="col">
-                            <a href="#" class="btn btn-success btn-sm" onclick="validateRequest(this, true)">Valider</a>
-                            <a href="#" class="btn btn-danger btn-sm" onclick="validateRequest(this, false)">Ne pas valider</a>
+                            <!-- validation des demandes -->
+                            {% if demande.status == "En attente" %}
+                                <form method="POST" action="{% url 'validation' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="leave_request_id" value="{{ demande.id }}">
+                                    <button type="submit" name="action" value="valider" class="btn btn-success btn-sm" onclick="validateRequest(this, true)">Valider</button>
+                                    <button type="submit" name="action" value="refuser" class="btn btn-danger btn-sm" onclick="validateRequest(this, false)">Ne pas valider</button>
+                                </form>
+                            {% elif demande.status == "Validé" %}
+                                <span class="text-success">Validé</span>
+                            {% elif demande.status == "Refusé" %}
+                                <span class="text-danger">Refusé</span>
+                            {% endif %}
                         </td>
                     </tr>
                     </tbody>

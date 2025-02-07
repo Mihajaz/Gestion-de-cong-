@@ -29,14 +29,22 @@ def validation(request):
             return redirect('validation')
 
         if action == "valider":
-            leave_request.status = "Validé"
+            if request.user.employee.poste == "Manageur":
+                leave_request.status = "En attente" # En attente de validation par le directeur
+            else:
+                leave_request.status = "Validé" # Demande validee par le directeur  
+                leave_request.save()
+                messages.success(request, f"Demande de congé validée")
+                return redirect('validation')
+
         elif action == "refuser":
             leave_request.status = "Refusé"
+         
         
         leave_request.save()
         messages.success(request, f"Demande de congé {action}e avec succès.")
     
-    demandes = LeaveRequest.objects.all()
+    demandes = LeaveRequest.objects.filter(status="En attente")
     return render(request, 'validation.html', {'demandes': demandes})
 
 
@@ -127,6 +135,7 @@ def employe(request):
                 start_date=start_date,
                 end_date=end_date,  
                 reason=reason,
+                status = "En attente",
             )
          
     
@@ -134,7 +143,7 @@ def employe(request):
             return redirect('employe')
     # Récupérer la dernière demande de congé en attente de l'utilisateur
     employee = request.user.employee
-    pending_leave_requests = LeaveRequest.objects.filter(employee=employee, approval__isnull=True)  
+    pending_leave_requests = LeaveRequest.objects.filter(employee=employee).order_by('-id')  
     return render(request, 'employe.html', {'pending_leave_requests': pending_leave_requests})
             
     

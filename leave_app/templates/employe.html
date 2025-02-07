@@ -4,10 +4,10 @@
 
 {% block content %}
 
-<i class="bi bi-bell-fill" id="notification-icon" style="position: fixed; top: 80px; right: 150px; font-size: 2rem; cursor: pointer;"></i>
+<i class="bi bi-bell-fill" id="notification-icon" style="position: fixed; top: 60px; right: 150px; font-size: 2rem; cursor: pointer;"></i>
 
 <!-- Interface de notification (cachée par défaut) -->
-<div id="notification-panel" style="display: none; position: fixed; top: 140px; right: 200px; width: 250px; background: white; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); padding: 15px; border-radius: 8px;">
+<div id="notification-panel" style="display: none; position: fixed; top: 100px; right: 200px; width: 250px; background: white; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); padding: 15px; border-radius: 8px;">
     <div class="d-grid gap-2">
         <p><strong>Votre demande :</strong></p>
         
@@ -15,9 +15,19 @@
             {% for request in pending_leave_requests %}
                 <p>
                     Congé du <span>{{ request.start_date }}</span> au <span>{{ request.end_date }}</span>
-                    <div class="text-center p-2" style="background: #f8d7da; color: #721c24; border-radius: 5px;">
-                        {{ request.status|default:"En attente" }}
-                    </div>
+                    <div class="text-center p-2" style="
+    border-radius: 5px;
+    {% if request.status == 'Validé' %}
+        background:rgb(134, 233, 157); color: #155724;
+    {% elif request.status == 'Refusé' %}
+        background:rgb(236, 128, 137); color: #721c24;
+    {% else %}
+        background: #fff3cd; color: #856404;
+    {% endif %}
+">
+    {{ request.status|default:"En attente" }}
+</div>
+
                 </p>
             {% endfor %}
         {% else %}
