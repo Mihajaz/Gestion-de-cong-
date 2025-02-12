@@ -8,8 +8,7 @@ from django.contrib.auth.models import User
 class Employee(models.Model):
     user_id = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='employee')
     poste = models.CharField(max_length=100, null=True, blank=True) 
-    
-    
+
     def __str__(self):
         return self.user_id.username if self.user_id else "Employe sans utilisateur"
     
@@ -20,6 +19,8 @@ class LeaveRequest(models.Model):
     end_date = models.DateField(auto_now=False, auto_now_add=False)
     reason = models.TextField(max_length=50)
     status = models.CharField(max_length=20, default="En attente", choices=[("En attente", "En attente"), ("Validé", "Validé"), ("Refusé", "Refusé")])
+    approved = models.BooleanField(default=False)
+
 
     
     
@@ -27,7 +28,6 @@ class Approval(models.Model):
     leave_request = models.ForeignKey('LeaveRequest', verbose_name=("Demande de congé"), on_delete=models.CASCADE)
     responsable = models.CharField(max_length=50)
     direction = models.CharField(max_length=50)
-    
 
 
 

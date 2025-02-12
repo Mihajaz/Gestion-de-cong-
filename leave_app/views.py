@@ -1,150 +1,105 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import TemplateView, FormView, View
+from django.contrib.auth.views import LoginView, LogoutView
+from django.urls import reverse_lazy
 from .models import Employee, LeaveRequest
 
-# Create your views here.
 
-#interface d'accueil
-def home(request):
-    return render(request, 'home.html')
+# Interface d'accueil
+class HomeView(TemplateView):
+    template_name = "home.html"
 
-#interface du directeur et manageur
-@login_required
-def validation(request):
-    if request.user.employee.poste not in ["Directeur", "Manageur"]:
-        return redirect('employe')
-    
-    if request.method == "POST":
-        leave_request_id = request.POST.get("leave_request_id")
-        action = request.POST.get("action")  # 'valider' ou 'refuser'
 
-        try:
-            leave_request = LeaveRequest.objects.get(id=leave_request_id)
-        except LeaveRequest.DoesNotExist:
-            messages.error(request, "Demande de congé introuvable.")
-            return redirect('validation')
+# Interface de validation pour Directeur et Manager
+class ValidationView(LoginRequiredMixin, TemplateView):
+    template_name = "validation.html"
 
-        if action == "valider":
-            if request.user.employee.poste == "Manageur":
-                leave_request.status = "En attente" # En attente de validation par le directeur
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["demandes"] = LeaveRequest.objects.filter(status="En attente")
+        return context
+
+
+# Inscription
+class RegisterView(TemplateView):
+    template_name = "register.html"
+    success_url = reverse_lazy("login")
+
+    def post(self, request, *args, **kwargs):
+        if request.method == "POST":
+            username = request.POST["username"]
+            poste = request.POST["poste"]
+            password = request.POST["password"]
+            email = request.POST["email"]
+
+            if User.objects.filter(username=username).exists():
+                messages.error(request, "Ce nom d'utilisateur existe déjà")
             else:
-                leave_request.status = "Validé" # Demande validee par le directeur  
-                leave_request.save()
-                messages.success(request, f"Demande de congé validée")
-                return redirect('validation')
+                user = User.objects.create_user(username=username, email=email, password=password)
+                Employee.objects.create(user_id=user, poste=poste)
+                messages.success(request, "Inscription réussie. Connectez-vous maintenant !")
+                return redirect("login")
 
-        elif action == "refuser":
-            leave_request.status = "Refusé"
-         
-        
-        leave_request.save()
-        messages.success(request, f"Demande de congé {action}e avec succès.")
-    
-    demandes = LeaveRequest.objects.filter(status="En attente")
-    return render(request, 'validation.html', {'demandes': demandes})
+        return self.get(request, *args, **kwargs)
 
 
+# Connexion
+class CustomLoginView(LoginView):
+    template_name = "login.html"
 
-#interface et condition de signin
-def register(request):
-    if request.method == "POST":
-        username = request.POST['username']
-        poste = request.POST['poste']
-        password = request.POST['password']
-        email = request.POST['email']
-    
-        print("PARAMS POST")
-        print(request.POST)
-        
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password
-        )
-        
-        
-        if Employee.objects.filter(user_id=user.id).exists():
-            messages.error(request,"ce nom d'utilisateur existe déja") 
-        else:
-            Employee.objects.create(user_id=user, poste=poste)
-            messages.success(request,"Inscription reussie.Connecter-vous maintenant!")
-            return redirect('login')
-    
-    return render(request,'register.html')
-      
-      
-# interface et condition de login
-def login_view(request):
-    if request.method == "POST":
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        
-        # print(request.POST)
-        # print(username)
-        
-        user = authenticate(request, username=username, password=password)  # Vérifie les identifiants
-        
-        if user is not None:
-            print('logged in')
-            login(request,user) 
-            
-            # Connecte l'utilisateur
-            messages.success(request, "Connexion réussie.")
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        user = self.request.user
 
-            # Redirection en fonction du poste
-        
-            if user.employee.poste in ["Directeur", "Manageur"]:
-                return redirect('validation')
-            else:
-                return redirect('employe')
-        
-        else:
-            messages.error(request, "Nom d'utilisateur ou mot de passe incorrect.")
+        # Vérifier si l'utilisateur a un employé associé
+        if hasattr(user, "employee") and user.employee.poste in ["Directeur", "Manageur"]:
+            return redirect("validation")
+        return redirect("employe")
 
-    return render(request, 'login.html')
+# Déconnexion
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy("login")
 
-#logout
-def user_logout(request):
-    logout(request)
-    messages.success(request, "Vous avez été déconnecté.")
-    return redirect('login')
+    def dispatch(self, request, *args, **kwargs):
+        messages.success(request, "Vous avez été déconnecté.")
+        return super().dispatch(request, *args, **kwargs)
 
 
+# Interface employé avec demande de congé
+class VacationView(LoginRequiredMixin, TemplateView):
+    template_name = "employe.html"
+    success_url = reverse_lazy("employe")
 
+    def post(self, request, *args, **kwargs):
+        start_date = request.POST.get("start_date")
+        end_date = request.POST.get("end_date")
+        reason = request.POST.get("reason")
 
-#interface des employés
-@login_required
-def employe(request):
-    if request.method == "POST":
-        start_date = request.POST['start_date']
-        end_date = request.POST['end_date']
-        reason = request.POST['reason']
-        
-        
         if start_date and end_date and reason:
-            #recupère l'Employee associe a l'utilisateur
             employee = request.user.employee
-            
-            #Cree et enregistre la demande de congé
             LeaveRequest.objects.create(
                 employee=employee,
                 start_date=start_date,
-                end_date=end_date,  
+                end_date=end_date,
                 reason=reason,
-                status = "En attente",
+                status="En attente",
             )
-         
-    
-            messages.success(request, "Votre demande de conge a bien ete envoyee.")
-            return redirect('employe')
-    # Récupérer la dernière demande de congé en attente de l'utilisateur
-    employee = request.user.employee
-    pending_leave_requests = LeaveRequest.objects.filter(employee=employee).order_by('-id')  
-    return render(request, 'employe.html', {'pending_leave_requests': pending_leave_requests})
-            
-    
+            messages.success(request, "Votre demande de congé a bien été envoyée.")
+            return redirect("employe")
+
+        return self.get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        employee = self.request.user.employee
+        context["pending_leave_requests"] = LeaveRequest.objects.filter(employee=employee).order_by("-id")
+        return context
+
+
+
 
