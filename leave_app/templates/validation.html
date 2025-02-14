@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load viewflow static %}
 
 {% block title %}Validation des Congés{% endblock %}
 
@@ -28,16 +29,29 @@
                         <td scope="col">{{demande.reason}}</td>
                         <td scope="col">
                             <!-- validation des demandes -->
-                            {% if demande.status == "En attente" %}
-                                <form method="POST" action="{% url 'validation' %}">
+                            {% if demande.request_status == "En attente" %}
+                                    <form method="POST" action="{{ activation.url }}">
                                     {% csrf_token %}
+                                    {{activation.management_form}}
+                                    
+
                                     <input type="hidden" name="leave_request_id" value="{{ demande.id }}">
-                                    <button type="submit" name="action" value="valider" class="btn btn-success btn-sm" ">Valider</button>
-                                    <button type="submit" name="action" value="refuser" class="btn btn-danger btn-sm" ">Ne pas valider</button>
+                                    
+                                    <!-- Actions pour le manager -->
+                                    {% if demande.leave_request_process.is_manager_approved == False %}
+                                        <button type="submit" name="action" value="valider_manager" class="btn btn-success btn-sm">Valider Manager</button>
+                                        <button type="submit" name="action" value="refuser_manager" class="btn btn-danger btn-sm">Refuser Manager</button>
+                                    {% endif %}
+                                    
+                                    <!-- Actions pour le directeur -->
+                                    {% if demande.leave_request_process.is_manager_approved == True and demande.leave_request_process.is_director_approved == False %}
+                                        <button type="submit" name="action" value="valider_directeur" class="btn btn-success btn-sm">Valider Directeur</button>
+                                        <button type="submit" name="action" value="refuser_directeur" class="btn btn-danger btn-sm">Refuser Directeur</button>
+                                    {% endif %}
                                 </form>
-                            {% elif demande.status == "Validé" %}
+                            {% elif demande.request_status == "Validé" %}
                                 <span class="text-success">Validé</span>
-                            {% elif demande.status == "Refusé" %}
+                            {% elif demande.request_status == "Refusé" %}
                                 <span class="text-danger">Refusé</span>
                             {% endif %}
                         </td>
